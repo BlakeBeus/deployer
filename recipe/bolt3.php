@@ -3,13 +3,13 @@ namespace Deployer;
 require_once __DIR__ . '/common.php';
 
 // Configuration
-set('shared_files', []);
 
-set('shared_dirs', [
+set('copy_dirs', [
     'public/files',
     'public/thumbs',
     'extensions',
     'public/extensions',
+    'extensions',
     'vendor'
 
 ]);
@@ -25,6 +25,17 @@ set('writable_dirs', [
     'public/theme',
     'vendor'
 ]);
+
+
+desc('Restart PHP-FPM service');
+task('php-fpm:restart', function () {
+    // The user must have rights for restart service without sudo password if you get the below message
+    //[RuntimeException]
+    //sudo: no tty present and no askpass program specified
+    //sudo visudo
+    //username ALL=NOPASSWD: /usr/sbin/service php7.1-fpm reload
+    run('sudo service php7.1-fpm reload');
+});
 
 
 // Bolt tasks
@@ -43,8 +54,8 @@ task('deploy', [
     'deploy:lock',
     'deploy:release',
     'deploy:update_code',
-    'deploy:shared',
     'deploy:writable',
+    'deploy:copy_dirs',
     'deploy:vendors',
     'deploy:clear_paths',
     'deploy:symlink',
